@@ -1,1 +1,50 @@
 name: build and deploy Web & Android
+on: 
+    push: 
+        branches: [main]
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: [24.x]
+        steps:
+            - name: Setup repo
+              uses: actions/checkout@v3
+            - name: Use Node.js ${{matrix.node-version}}
+              uses: actions/setup-node@v3
+              with: 
+                node-version: ${{matrix.node-version}}
+            - name: Install dependencies
+              run: npm install
+            - name: Build web app
+              run: npm run predeploy
+            - name: Setup EAS
+              uses: expo/expo-github-action@v8
+              with:
+                eas-version: latest
+                token: ${{ secrets.EXPO_TOKEN }}
+            - name: Build app
+              run: eas build --platform android --non-interactive --no-wait
+            - name: Setup Pages
+              id: pages
+              uses: actions/configure-pages@v3
+            - name: Upload artifact
+              uses: actions/upload-pages-artifact@v3
+              with:
+                path: dist
+                if-no-files-found: error
+    deploy: 
+        environment:
+            name: github-pages
+            url: ${{steps.deployment.outputs.page_url}}
+        runs-on: ubuntu-latest
+        permissions: 
+            pages: write
+            id-token: write
+        needs: build
+        steps: 
+            - name : Deploy to Github Pages
+              id: deployment
+              uses: actions/deploy-pages@v4
+
