@@ -19,7 +19,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.eli712.webcloudynovprojeteliel"
     },
     "web": {
       "bundler": "metro",
@@ -45,6 +46,12 @@
       "typedRoutes": true,
       "reactCompiler": true,
       "baseUrl": "/web-cloud-ynov-projet-eliel"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "dc322636-45be-41a2-9932-31c7a6f5f664"
+      }
     }
   }
 }
