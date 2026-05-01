@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import Toast from 'react-native-toast-message'; 
 // Importation de votre méthode expert
 import { signIn } from '../services/auth_signin';
+import { signinWithGithub } from '../services/auth_github';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -11,6 +12,25 @@ export default function LoginScreen() {
   const [password, onChangePassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const handleGithubLogin = async () => {
+    setLoading(true);
+    try {
+      const user = await signinWithGithub();
+      if (user) {
+        Toast.show({
+          type: 'success',
+          text1: 'Connexion réussie',
+          text2: 'Bienvenue via GitHub !'
+        });
+        router.replace('/profile');
+      }
+    } catch (error: any) {
+      setErrorMessage("Erreur d'authentification GitHub : " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Fonction de validation
   const validateForm = () => {
@@ -87,6 +107,15 @@ export default function LoginScreen() {
           title="Se connecter avec un numéro de téléphone" 
           onPress={() => router.push('/phone-login')} 
           color="#2196F3" 
+        />
+      </View>
+
+      <View style={{ marginTop: 10 }}>
+        <Button 
+          disabled={loading}
+          title="Se connecter avec GitHub" 
+          onPress={handleGithubLogin} 
+          color="#333" 
         />
       </View>
     </View>
