@@ -7,6 +7,7 @@ import Toast from 'react-native-toast-message';
 import { signIn } from '../services/auth_signin';
 import { signinWithGithub } from '../services/auth_github';
 import { signinWithFacebook } from '../services/auth_facebook_sigin_popup';
+import { signinAnonymouslyUser } from '../services/auth_anonymous';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -48,6 +49,25 @@ export default function LoginScreen() {
       }
     } catch (error: any) {
       setErrorMessage("Erreur d'authentification Facebook : " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAnonymousLogin = async () => {
+    setLoading(true);
+    try {
+      const user = await signinAnonymouslyUser();
+      if (user) {
+        Toast.show({
+          type: 'success',
+          text1: 'Connexion réussie',
+          text2: 'Bienvenue, invité !'
+        });
+        router.replace('/profile');
+      }
+    } catch (error: any) {
+      setErrorMessage("Erreur d'authentification anonyme : " + error.message);
     } finally {
       setLoading(false);
     }
@@ -148,6 +168,16 @@ export default function LoginScreen() {
           <FontAwesome name="facebook" size={24} color="white" />
         </TouchableOpacity>
       </View>
+
+      <TouchableOpacity 
+        style={{ marginTop: 25 }} 
+        onPress={handleAnonymousLogin}
+        disabled={loading}
+      >
+        <Text style={{ color: 'gray', textDecorationLine: 'underline' }}>
+          Continuer en tant qu'invité
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
