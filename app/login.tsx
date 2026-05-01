@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Toast from 'react-native-toast-message'; 
 // Importation de votre méthode expert
 import { signIn } from '../services/auth_signin';
 import { signinWithGithub } from '../services/auth_github';
+import { signinWithFacebook } from '../services/auth_facebook_sigin_popup';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -27,6 +29,25 @@ export default function LoginScreen() {
       }
     } catch (error: any) {
       setErrorMessage("Erreur d'authentification GitHub : " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFacebookLogin = async () => {
+    setLoading(true);
+    try {
+      const user = await signinWithFacebook();
+      if (user) {
+        Toast.show({
+          type: 'success',
+          text1: 'Connexion réussie',
+          text2: 'Bienvenue via Facebook !'
+        });
+        router.replace('/profile');
+      }
+    } catch (error: any) {
+      setErrorMessage("Erreur d'authentification Facebook : " + error.message);
     } finally {
       setLoading(false);
     }
@@ -102,21 +123,30 @@ export default function LoginScreen() {
         )}
       </View>
 
-      <View style={{ marginTop: 20 }}>
-        <Button 
-          title="Se connecter avec un numéro de téléphone" 
-          onPress={() => router.push('/phone-login')} 
-          color="#2196F3" 
-        />
-      </View>
-
-      <View style={{ marginTop: 10 }}>
-        <Button 
+      <View style={styles.socialContainer}>
+        <TouchableOpacity 
+          style={[styles.socialButton, { backgroundColor: '#2196F3' }]} 
+          onPress={() => router.push('/phone-login')}
           disabled={loading}
-          title="Se connecter avec GitHub" 
-          onPress={handleGithubLogin} 
-          color="#333" 
-        />
+        >
+          <FontAwesome name="phone" size={24} color="white" />
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={[styles.socialButton, { backgroundColor: '#333' }]} 
+          onPress={handleGithubLogin}
+          disabled={loading}
+        >
+          <FontAwesome name="github" size={24} color="white" />
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.socialButton, { backgroundColor: '#1877F2' }]} 
+          onPress={handleFacebookLogin}
+          disabled={loading}
+        >
+          <FontAwesome name="facebook" size={24} color="white" />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -159,5 +189,23 @@ const styles = StyleSheet.create({
     maxWidth: 300,
     minHeight: 45, // Évite les sauts de mise en page avec l'ActivityIndicator
     justifyContent: 'center'
+  },
+  socialContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 30,
+  },
+  socialButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 12,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
 });

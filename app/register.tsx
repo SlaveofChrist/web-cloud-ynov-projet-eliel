@@ -4,7 +4,6 @@ import { useRouter } from 'expo-router';
 import Toast from 'react-native-toast-message'; 
 // Importation de votre méthode expert pour l'inscription
 import { signUp } from '../services/auth_signup';
-import { signinWithGithub } from '../services/auth_github';
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -12,25 +11,6 @@ export default function RegisterScreen() {
   const [password, onChangePassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
-  const handleGithubSignup = async () => {
-    setLoading(true);
-    try {
-      const user = await signinWithGithub();
-      if (user) {
-        Toast.show({
-          type: 'success',
-          text1: 'Inscription réussie',
-          text2: 'Bienvenue via GitHub !'
-        });
-        router.replace('/profile');
-      }
-    } catch (error: any) {
-      setErrorMessage("Erreur d'inscription GitHub : " + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Fonction de validation (identique au modèle avec une logique de sécurité)
   const validateForm = () => {
@@ -111,14 +91,7 @@ export default function RegisterScreen() {
         <Text style={styles.linkText}>Déjà un compte ? Se connecter</Text>
       </TouchableOpacity>
 
-      <View style={{ marginTop: 20 }}>
-        <Button 
-          disabled={loading}
-          title="S'inscrire avec GitHub" 
-          onPress={handleGithubSignup} 
-          color="#333" 
-        />
-      </View>
+
     </View>
   );
 }
