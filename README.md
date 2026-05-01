@@ -10,4 +10,3 @@ Pour réaliser la connexion par téléphone, il faut utiliser le numéro de test
 **`+33 6 00 00 00 00`**
 
 ### ✅ Image de l'EAS en succès
-![Succès du build EAS](./eas-success.png)
